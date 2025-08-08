@@ -1,112 +1,139 @@
-# VR 인터랙티브 스토리 게임
+# Unity VR 인터랙티브 스토리 게임
 
-본 프로젝트는 Unity와 XR Interaction Toolkit을 기반으로 한 VR 인터랙티브 스토리 게임입니다.  
-플레이어는 직접 상호작용하며 다양한 환경, 장치, 그리고 스토리 요소들을 경험하게 됩니다.
+![Story Preview](https://img.youtube.com/vi/hvpG1fLjlkE/maxresdefault.jpg)
 
-[![VR 인터랙티브 스토리 게임 시연 영상](https://img.youtube.com/vi/hvpG1fLjlkE/maxresdefault.jpg)](https://youtu.be/hvpG1fLjlkE)
-[시연 영상 보기](https://youtu.be/hvpG1fLjlkE)
+[**시연 영상 보기**](https://youtu.be/hvpG1fLjlkE)
+
+---
+
+## 프로젝트 개요
+
+Unity와 XR Interaction Toolkit을 기반으로 개발된 **VR 인터랙티브 스토리 게임**입니다.
+플레이어는 다양한 오브젝트와 환경 요소와 직접 상호작용하면서 몰입감 있는 스토리를 경험하게 됩니다.
+스토리텔링, 애니메이션, 인터랙션을 **VR 환경에 자연스럽게 녹여낸** 것이 특징입니다.
 
 ---
 
 ## 주요 기능
 
-| 기능 | 설명 |
-|------|------|
-| 오디오 매니지먼트 | `AudioManager`를 통한 게임 내 모든 사운드 제어 |
-| 버튼과 문 시스템 | 버튼을 눌러 애니메이션 + 사운드와 함께 문 열기 |
-| 총기 시스템 | `MeteorPistol`: 레이캐스트 기반 타격 + 파괴 시스템 |
-| 파괴 가능한 오브젝트 | 일정 시간 상호작용 후 파괴되고 파편으로 전환 |
-| 조작 방식 설정 | Snap Turn / Continuous Turn 선택 가능 (`PlayerPrefs` 연동) |
-| 씬 전환 | `FadeScreen`과 함께 자연스럽게 씬 변경 |
-| 손 모델 처리 | 오브젝트를 잡을 때 손 모델을 감추고, 놓을 때 복원 |
-| UI 사운드 | 버튼 클릭, 마우스 오버 사운드 효과 지원 |
-| 소켓 제한 | 특정 태그 오브젝트만 장착 가능한 소켓 구현 |
-| 쓰레기통 트리거 | 특정 태그 오브젝트가 진입 시 자동 제거 처리 |
+| 시스템       | 설명                                                         |
+| --------- | ---------------------------------------------------------- |
+| 오디오 관리    | `AudioManager`를 통한 전체 사운드 제어 (BGM, SFX, UI 등)              |
+| 스토리 연출    | Unity Timeline 기반 연출 시스템 (`PlayableDirector`, `PlaySteps`) |
+| 무기 시스템    | `MeteorPistol`을 통한 상호작용/파괴형 오브젝트 타격                        |
+| 파괴 시스템    | 일정 시간 상호작용 시 `Breakable` 오브젝트가 파괴 및 파편화                    |
+| UI 시스템    | 버튼 클릭, 마우스 오버 사운드, 씬 전환 등 자연스러운 인터페이스                      |
+| 조작 설정     | Snap Turn / Continuous Turn 선택 가능 (`PlayerPrefs` 저장)       |
+| 제한 소켓 시스템 | 특정 태그만 장착 가능한 XR 소켓 구현                                     |
+| 환경 인터랙션   | 문 열기, 트리거 진입, 쓰레기통 제거 등 환경과의 상호작용 가능                       |
 
 ---
 
-## 폴더 구조 (일부)
+## 게임 흐름 예시
 
 ```
+Start → Scene 연출 (PlaySteps)
+→ 오브젝트 탐색 / 버튼 상호작용
+→ 문 열기 / 이동 → 다음 씬 전환
+→ 특정 태그 오브젝트 처리 → 엔딩/클리어
 
+※ 스토리 연출은 Timeline + 인터랙션으로 구성
+```
+
+---
+
+## 코드 및 폴더 구조
+
+```bash
 Assets/
 ├── Scripts/
 │   ├── Audio/
-│   │   └── AudioManager.cs
+│   │   └── AudioManager.cs            # 전역 사운드 관리
 │   ├── Interactions/
-│   │   ├── ButtonPushOpenDoor.cs
-│   │   ├── MeteorPistol.cs
-│   │   ├── Breakable.cs
-│   │   └── XRSocketTagInteractor.cs
+│   │   ├── MeteorPistol.cs           # 무기 발사 및 타격
+│   │   ├── Breakable.cs              # 파괴 가능한 오브젝트
+│   │   ├── ButtonPushOpenDoor.cs     # 버튼 클릭 → 문 열기
+│   │   └── XRSocketTagInteractor.cs  # 특정 태그만 장착 가능한 소켓
 │   ├── UI/
+│   │   ├── UIAudio.cs                # UI 사운드 처리
 │   │   ├── GameStartMenu.cs
-│   │   ├── SetOptionFromUI.cs
-│   │   ├── UIAudio.cs
+│   │   └── SetOptionFromUI.cs
 │   ├── System/
-│   │   ├── SceneTransitionManager.cs
-│   │   ├── FadeScreen.cs
-│   │   └── PlaySteps.cs
+│   │   ├── SceneTransitionManager.cs # 씬 전환 관리
+│   │   ├── FadeScreen.cs             # 페이드 인/아웃 연출
+│   │   └── PlaySteps.cs              # Timeline 실행 및 연출 스텝
 │   ├── Environment/
-│   │   ├── SpaceOutsideController.cs
-│   │   ├── TrashCan.cs
-│   │   └── TriggerZone.cs
+│   │   ├── TrashCan.cs               # 쓰레기 오브젝트 처리
+│   │   └── TriggerZone.cs            # 특정 태그 진입 감지
 │   └── Settings/
 │       └── SetTurnTypeFromPlayerPref.cs
-
 ```
 
 ---
 
-## 기술 스택
+## 조작 방법 (VR 컨트롤러 기준)
 
-- Unity 2022+
-- XR Interaction Toolkit
-- Unity Timeline (PlayableDirector)
-- C#
-- VR 디바이스 지원 (Meta Quest, HTC Vive 등)
+| 기능       | 조작 방식                                  |
+| -------- | -------------------------------------- |
+| 이동       | Snap Turn / Continuous Turn 선택 가능      |
+| 무기 집기/발사 | Grab → Trigger                         |
+| 상호작용     | 버튼 가까이 → Trigger                       |
+| 장착       | 특정 태그 오브젝트만 장착 가능                      |
+| UI 조작    | 레이 기반 선택 + 트리거 클릭                      |
+| 파괴       | `MeteorPistol`로 발사 → `Breakable` 대상 파괴 |
 
 ---
 
-## 주요 구현 방식
+## 실행 방법
+
+1. Unity 2022 이상에서 프로젝트 열기
+2. **XR Interaction Toolkit 세팅 필요**
+3. XR 디바이스 연결 후 `Main Scene` 실행
+4. ▶ 버튼 클릭 → 씬 시작 → VR 컨트롤러로 상호작용 진행
+
+---
+
+## 대표 시스템 구현 방식
 
 ### 씬 전환 시스템
-- `SceneTransitionManager`를 통해 씬을 자연스럽게 페이드 효과와 함께 전환
-- `FadeScreen`으로 알파값을 조절하여 시각적 몰입감을 높임
 
-### 오디오 재생 방식
-- `AudioManager`를 중심으로 전역 사운드 관리
-- `PlayAudioFromAudioManager`, `UIAudio` 등을 통해 다양한 상황에 맞는 효과음 제공
+* `SceneTransitionManager` + `FadeScreen` 조합으로 몰입도 높은 전환 제공
+* 컷씬 흐름은 `PlayableDirector`를 통해 연출 제어
 
-### 상호작용 무기 시스템
-- `MeteorPistol`은 XRGrabInteractable 기반으로 잡고 방아쇠를 당기면 발사
-- 레이캐스트를 이용해 `Breakable` 오브젝트에 타격 가능
+### 사운드 시스템
 
-### 설정 저장 시스템
-- `PlayerPrefs`를 활용해 회전 방식 설정 (Snap vs Continuous)을 저장/불러오기
-- `SetOptionFromUI.cs`, `SetTurnTypeFromPlayerPref.cs`가 이를 처리
+* 모든 오디오 재생은 `AudioManager` 중심
+* UI 이벤트(`UIAudio.cs`), 버튼/문(`PlayAudioFromAudioManager.cs`) 등 상황별 분리
 
----
+### 설정 저장
 
-## 테스트 및 디버깅 팁
-
-- VR 환경에서 작동 여부를 반드시 XR 디바이스로 테스트하세요
-- `AudioManager`에 사운드 등록이 누락되지 않았는지 확인하세요
-- `FadeScreen`이 제대로 작동하려면 Renderer가 있는 오브젝트가 필요합니다
-- `TriggerZone`의 `targetTag` 설정 누락 시 이벤트가 발생하지 않습니다
+* `PlayerPrefs` 기반 회전 방식 저장
+* `SetTurnTypeFromPlayerPref.cs`에서 불러와 적용
 
 ---
 
-## 기여 및 확장 아이디어
+## 향후 개선 사항
 
-- 햅틱 피드백 추가: XR 디바이스 진동을 활용한 몰입감 향상
-- 퍼즐 시스템 확장: `XRSocketTagInteractor`를 퍼즐 요소로 활용
-- 저장/불러오기 시스템: PlayerPrefs 기반의 게임 진행 상태 저장
-- 스토리 연출 강화: `PlaySteps`와 Timeline으로 컷씬 연출 다양화
+* 음성 더빙 및 자막 시스템 추가
+* 사용자 선택에 따른 분기형 스토리 구조 구현
+* 다국어 지원 (한글/영어 UI)
+* 햅틱 연출 보강 및 조명 기반 연출 강화
+* 퍼즐 시스템 도입 (소켓 조립, 연쇄 트리거 등)
 
 ---
 
-## 제작자
+## 라이선스
 
-- 기획/개발/설계: 김진홍
-- 영상 시연: [YouTube 링크](https://youtu.be/hvpG1fLjlkE)
 ```
+MIT License
+
+본 프로젝트는 자유롭게 사용/수정/배포 가능하며, 상업적 사용 시 출처 표기를 권장합니다.
+```
+
+---
+
+## 시연 영상 다시 보기
+
+[![Demo Video](https://img.youtube.com/vi/hvpG1fLjlkE/maxresdefault.jpg)](https://youtu.be/hvpG1fLjlkE)
+
+[https://youtu.be/hvpG1fLjlkE](https://youtu.be/hvpG1fLjlkE)
